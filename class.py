@@ -33,7 +33,7 @@ class kdtree(object):
                 points.sort(key=lambda x: x[i])
                 
                 half = len(points) >> 1
-                # print(points[:half],points[half],points[half:],i)
+            
                
                 v_left = __build(points[:half],dimension,i+1)
                 v_right = __build(points[half:],dimension,i+1)
@@ -41,48 +41,7 @@ class kdtree(object):
     
         self.root = __build(points,dimension,0)   
 
-    # def nearest(self, test):
-    #     def __near(node,test,closest_p,closest_d):
-            
-    #         if node == None:
-    #             return (closest_p,closest_d)   
-    #         if node.is_leaf :
-                
-    #             dist = euc( node.point,test )
-    #             # print(node.point)
-    #             if(dist < closest_d):
-    #                 closest_p = node.point
-    #                 closest_d =dist
-    #                 return (closest_p,closest_d)                   
-    #             else:
-    #                 return(closest_p,closest_d)   
-    #         else:
-    #             #chooses if the dimension of the test point
-    #             #is greater or smaller than the median of the split hyper plane
-
-    #             if(node.point <= test[node.dim]):
-                    
-    #                 p=__near(node.left,test,closest_p,closest_d)
-    #             else:
-                    
-    #                 p= __near(node.right,test,closest_p,closest_d)
-    #             closest_p =p[0]
-    #             closest_d =p[1]
-    #             radius =  abs( closest_p[node.dim]- test[node.dim])
-    #             cp_to_plane =abs( closest_p[node.dim]- node.point) 
-    #             if (radius < cp_to_plane ):
-    #                 return p
-    #             if(node.point <= test[node.dim]):
-                    
-    #                 p=__near(node.right,test,closest_p,closest_d)
-    #             else:
-                    
-    #                 p= __near(node.left,test,closest_p,closest_d)
-                
-    #             return p
-    #     #fix this
-    #     temp_point=(0,0)
-    #     print(__near(self.root,test,temp_point,100000000))
+  
        
     def knearest(self,test,k) :
         def __knear(node,test,k,heap):
@@ -91,6 +50,9 @@ class kdtree(object):
             if node.is_leaf :
                 dist = euc( node.point,test )
                 
+                #using heapq as a min priority heap
+                #by making the values negative
+                #so the biggest value in the heap will be -heap[0]
                 if len(heap)<k:
                     heapq.heappush(heap,( -dist,node.point))
                 else:
@@ -100,7 +62,7 @@ class kdtree(object):
                 
                 #chooses if the dimension of the test point
                 #is greater or smaller than the median of the split hyper plane
-            
+                #this is a recursive search for leafs
             else:
                 if(node.point > test[node.dim]):
                     
@@ -109,7 +71,9 @@ class kdtree(object):
                     
                     __knear(node.right,test,k,heap)     
 
-                # closest_p = heap[0][1]
+                #instead of returning the best node found so far 
+                #its checked if there a possibility of a  nearer neighbor
+                #in a untested area
                 radius = -heap[0][0]
                 cp_to_plane =abs( test[node.dim] - node.point) 
                 if ( radius <  cp_to_plane ):   
@@ -122,8 +86,7 @@ class kdtree(object):
                         
                         __knear(node.left,test,k,heap)
                
-                
-                  
+
         heap=[]
         heapq.heapify(heap)
         __knear(self.root,test,k,heap)      
