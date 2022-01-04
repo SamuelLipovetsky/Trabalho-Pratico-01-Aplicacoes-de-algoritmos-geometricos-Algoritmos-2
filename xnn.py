@@ -2,6 +2,7 @@
 
 from random import randrange, seed, random
 import heapq
+import numpy
 #this class can represent both a point or a hyperplane
 #a leaf is always a point and the nodes in between are always hyperplanes
 #if it is a hyperplane the "point" atribute represents the median
@@ -17,6 +18,9 @@ class node(object):
         self.id=id
         #category of the point 
         self.cat=cat
+    def __lt__(self, nxt):
+        return True
+        
 #simple euclidian distance function
 def euc(a,b):
     sum=0
@@ -30,10 +34,10 @@ class kdtree(object):
     def __init__(self, points,dimension):    
         def __build(points,dimension,i):
             if len(points)==1:
-                # print(points[0][:-1])
+                #create a leaf that represents a points
                 return  node(None,None,points[0][:-1],i,True,points[0][-1][0],points[0][-1][1])
             else:
-         
+                #create a intermediate node that represents a hyperplane
                 i= i%dimension
                 points.sort(key=lambda x: x[i])
                 half = len(points) >> 1
@@ -61,23 +65,24 @@ class xnn(object):
                 
                 #using heapq as a min priority heap
                 #by making the values negative
-                #so the biggest value in the heap will be -heap[0]
+                #so the biggest value in the heap will be -heap[0][0]
+                
                 if len(heap)<k:
-                    heapq.heappush(heap,( -dist,node.point,node.id,node.cat))
+                    heapq.heappush(heap,( -dist,node))
                     self.nearests = heap
                 else:
-                    if(dist < -heap[0][0]):
-                        heapq.heappushpop(heap, (-dist,node.point,node.id,node.cat))
+                    if(dist <= -heap[0][0]):
+                        heapq.heappushpop(heap, (-dist,node))
                         self.nearests = heap
                 
                 #chooses if the dimension of the test point
                 #is greater or smaller than the median of the split hyper plane
                 #this is a recursive search for leafs
             else:
-               
+             
                 if(node.point > test[node.dim]):
                     
-                    self.knear(node.left,test,k,heap)  
+                    self.knear(node.left,test,k,heap)    
                 else:
                     
                     self.knear(node.right,test,k,heap)     
@@ -98,26 +103,50 @@ class xnn(object):
                         self.knear(node.left,test,k,heap)
     #runs knearest neighbor algorithm for every point in the test split
     #creates a dictionary with the id points as key and
-    #the regression result and actual category of that point 
+    #the classification result and actual category of that point as values
     def knn_classifier(self,test,label_names,k):
         for  i in test:
       
             heap=[]
-            
+            self.nearests={}
             self.knear(self.root,i,k,heap)
+    
             cat_counter=0
             label_0 = label_names[0]
             label_1 = label_names[1]
-            for j in self.nearests:
-               
-                if str(j[-1]) == str(label_0):
+            #checks category of k nearest neighbors
+            #point at this time its a tuple with (-dist , node)
+            for point in self.nearests:
+                point= point[1]
+                if str(point.cat)==str(label_0): 
                     cat_counter+=1
             if cat_counter >  (k>>1) :
-                self.results[i[-1][0]] ={"regression":label_0,"true_category":i[-1][1]}
+                self.results[point.id] ={"classification":label_0,"true_category":point.cat,"Nearests_neighbors":self.nearests}
             else:
-                self.results[i[-1][0]] ={"regression":label_1,"true_category":i[-1][1]}
-         
-
-tree= xnn ([(2,3,(0,1)),(5,4,(1,0)),(9,6,(2,0)),(4,7,(3,0)),(8,1,(4,1)),(7,2,(5,0))])
-tree.knn_classifier([(6,6,(6,1)),(1,2,(7,0)),(3,2,(8,1)),(4,5,(9,0))],[0,1],3)
-print(tree.results)
+                self.results[point.id] ={"classification":label_1,"true_category":point.cat,"Nearests_neighbors":self.nearests}
+            
+    #returns the precision and recall for the relevant label
+    def get_stats(self,relevant_label):
+        false_positives=0
+        false_negatives=0
+        true_positives =0
+        true_negatives =0
+        for j in self.results:
+        
+            i=self.results[j]
+            
+            if i["true_category"]==relevant_label:
+                if i["classification"]== relevant_label:
+                    true_positives+=1
+                else:
+                    false_negatives+=1
+            else:
+                if i["classification"]== relevant_label:
+                    false_positives+=1
+                else:
+                    true_negatives+=1
+        # print(false_positives,false_negatives,true_positives,true_negatives)
+        precision = round(true_positives/(true_positives+false_positives),5)
+        recall= round (true_positives/(true_positives+false_negatives),5)
+        return precision,recall
+        
