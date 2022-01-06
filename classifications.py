@@ -30,7 +30,7 @@ print("precision:" + str(stats[0]),
 points = keel_dat_reader('./datasets/bupa.dat',", ")
 train,test = split(points,0.7)
 tree=xnn(train)
-tree.knn_classifier(test,["2","1"],20)
+tree.knn_classifier(test,["2","1"],30)
 print("dataset 3 -- bupa")
 stats=tree.get_stats("1")
 print("precision:" + str(stats[0]), 
