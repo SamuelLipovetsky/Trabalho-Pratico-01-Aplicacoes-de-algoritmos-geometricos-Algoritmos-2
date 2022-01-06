@@ -6,6 +6,8 @@
 @inputs Age, Year, Positive
 @outputs Survival
 @data
+10, 11, 12, positive
+13, 14, 15, positive
 38, 59, 2, negative
 39, 63, 4, negative
 49, 62, 1, negative
