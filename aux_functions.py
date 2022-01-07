@@ -15,7 +15,7 @@ def keel_dat_reader(file_path,separator):
                 i = i.strip().split(separator)
                 temp = i[-1]
                 #remove the last element bc it can be a string 
-                # i =i[:-1]
+        
                 i= list(map(float,(i[:-1])))
                 #inserting a tuple of (id,class)
                 #in each line for the knn algorithm
@@ -24,7 +24,7 @@ def keel_dat_reader(file_path,separator):
                 
         return lines[offset:]
 
-#return a train , test list 
+#returns two train , test lists 
 #there is a fake shuffle using random
 #bc some datasets have one class in the first half of elements
 #and the other class in the second half of the elements
@@ -34,8 +34,8 @@ def split(list,pct):
     test =[]
     for i in list:
         rand_int = random.randrange(0,10,1)
-
-        if random.randrange(0,10,1)> (pct*10.0):
+        #rand_int = random int from 0 to 10 
+        if rand_int> (pct*10.0):
             test.append(i)
         else:
             train.append(i)

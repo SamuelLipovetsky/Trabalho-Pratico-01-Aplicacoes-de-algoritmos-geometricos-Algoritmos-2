@@ -35,7 +35,7 @@ def euc(a, b):
         sum += temp*temp
     return sum**0.5
 
-#calcualtes the median in O(n) time
+#calcualtes the median in O(n) time for average case
 def quick_select(list, i, dim):
     if len(list) == 1:
         if (i == 0):
@@ -181,7 +181,7 @@ class xnn(object):
             # checks category of k nearest neighbors
             # point at this time its a tuple with (-dist , node)
             for point in self.nearests:
-
+                
                 if str(point.cat) == str(label_0):
                     cat_counter += 1
             # id and category of the test point

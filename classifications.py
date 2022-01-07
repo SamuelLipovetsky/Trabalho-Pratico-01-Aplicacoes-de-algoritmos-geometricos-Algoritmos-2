@@ -5,11 +5,16 @@ import time
 
 
 #dataset 1 -- pima
+#read points using aux function
 points = keel_dat_reader('./datasets/pima.dat',",")
+#split the points read into  train and  test 
 train,test = split(points,0.7)
+#generates a kd tree
 tree=xnn(train)
+#classify for evey point in the test list using the kd tree built
 tree.knn_classifier(test,["tested_positive","tested_negative"],20)
 print("dataset 1 -- pima")
+#generates stats by checking false positives /negatives etc.;
 stats=tree.get_stats("tested_positive")
 print("precision:" + str(stats[0]), 
     "recall:" + str(stats[1]),
