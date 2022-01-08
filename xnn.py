@@ -125,7 +125,6 @@ class xnn(object):
         if node.is_leaf:
 
             dist = euc(node.point, test)
-
             # using heapq as a min priority heap
             # by making the values negative
             # so the biggest value in the heap will be -(heap[0]).dist
@@ -175,6 +174,7 @@ class xnn(object):
             heap = []
             self.nearests = {}
             self.knear(self.root, i, k, heap)
+            self.nearests=heap
             cat_counter = 0
             label_0 = label_names[0]
             label_1 = label_names[1]
