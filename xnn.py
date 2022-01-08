@@ -41,7 +41,8 @@ def quick_select(list, i, dim):
         if (i == 0):
             return list[0]
 
-    pivot = random.choice(list)[dim] 
+    # pivot = random.choice(list)[dim] 
+    pivot = list[len(list)>>1][dim]
 
     pivots = []
     gt_pivot = []
@@ -76,7 +77,7 @@ class kdtree(object):
             else:
                 # create a intermediate node that represents a hyperplane
                 i = i % dimension
-                # find median in O(n) time
+                # find median 
                 median = quick_select(points, len(points) >> 1, i)
                 left = []
                 right = []
@@ -99,14 +100,6 @@ class kdtree(object):
 
                 return node(d_left, d_right, median[i], i, False)
 
-                # first implementation using sorting the points every time
-                # points.sort(key=lambda x: x[i])
-                # half = len(points) >> 1
-                # v_left = __build(points[:half], dimension, i+1)
-                # v_right = __build(points[half:], dimension, i+1)
-
-                # return node(v_left, v_right, points[half][i], i, False)
-
         self.root = __build(points, dimension, 0)
 
 
@@ -123,7 +116,6 @@ class xnn(object):
         if node == None:
             return
         if node.is_leaf:
-
             dist = euc(node.point, test)
             # using heapq as a min priority heap
             # by making the values negative
@@ -154,7 +146,7 @@ class xnn(object):
             # in a untested area
             radius = -heap[0].dist
             cp_to_plane = abs(test[node.dim] - node.point)
-            if (radius < cp_to_plane and len(heap) > k):
+            if (radius < cp_to_plane and len(heap) == k):
                 return
             else:
                 if(node.point > test[node.dim]):
@@ -163,6 +155,7 @@ class xnn(object):
                 else:
 
                     self.knear(node.left, test, k, heap)
+                    
     # runs knearest neighbor algorithm for every point in the test split
     # creates a dictionary with the id points as key and
     # the classification result and actual category of that point as values
@@ -221,3 +214,4 @@ class xnn(object):
                     (true_negatives+true_positives +
                     false_negatives+false_positives), 5)
         return precision, recall, acc
+
